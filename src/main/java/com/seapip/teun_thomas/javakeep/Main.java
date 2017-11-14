@@ -23,7 +23,6 @@ public class Main {
         ServletContextHandler context = new ServletContextHandler(server, "/*");
         context.addServlet(servlet, "/*");
 
-
         try {
             server.start();
             server.join();
