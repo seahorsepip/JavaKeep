@@ -9,7 +9,7 @@ public class NoteService {
 
     @GET
     public Response sayHello() {
-        String output = "Hello, Thomas!";
+        String output = "Hello, Thomas & Teun";
         return Response.status(200).entity(output).build();
     }
 }
