@@ -31,6 +31,7 @@ public class Main {
         } finally {
             server.destroy();
         }
+
         /*
         EntityManager entityManager = Persistence.createEntityManagerFactory("javaKeep").createEntityManager();
         Note note = new Note();
