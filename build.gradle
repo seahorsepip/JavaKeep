@@ -1,0 +1,19 @@
+apply plugin: 'idea'
+apply plugin: 'java'
+
+repositories {
+    jcenter()
+    mavenCentral()
+}
+
+dependencies {
+    compile group: 'org.hibernate', name: 'hibernate-gradle-plugin', version: '5.2.12.Final'
+    compile group: 'org.hibernate.javax.persistence', name: 'hibernate-jpa-2.1-api', version: '1.0.0.Final'
+    compile group: 'postgresql', name: 'postgresql', version: '9.4.1208-jdbc42-atlassian-hosted'
+    compile group: 'org.glassfish.jersey.core', name: 'jersey-server', version: '2.26'
+    compile group: 'org.glassfish.jersey.containers', name: 'jersey-container-servlet-core', version: '2.26'
+    compile group: 'org.glassfish.jersey.containers', name: 'jersey-container-jetty-http', version: '2.26'
+    compile group: 'org.glassfish.jersey.inject', name: 'jersey-hk2', version: '2.26'
+    compile group: 'org.eclipse.jetty', name: 'jetty-server', version: '9.4.7.v20170914'
+    compile group: 'org.eclipse.jetty', name: 'jetty-servlet', version: '9.4.7.v20170914'
+}

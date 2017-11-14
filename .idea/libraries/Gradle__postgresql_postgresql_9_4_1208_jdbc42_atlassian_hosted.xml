@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="Gradle: postgresql:postgresql:9.4.1208-jdbc42-atlassian-hosted">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/postgresql/postgresql/9.4.1208-jdbc42-atlassian-hosted/5c7e80698b80a5045fe64daa67426051bbd16a56/postgresql-9.4.1208-jdbc42-atlassian-hosted.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/JavaKeep.iml" filepath="$PROJECT_DIR$/.idea/modules/JavaKeep.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/JavaKeep_main.iml" filepath="$PROJECT_DIR$/.idea/modules/JavaKeep_main.iml" group="JavaKeep" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/JavaKeep_test.iml" filepath="$PROJECT_DIR$/.idea/modules/JavaKeep_test.iml" group="JavaKeep" />
+    </modules>
+  </component>
+</project>
