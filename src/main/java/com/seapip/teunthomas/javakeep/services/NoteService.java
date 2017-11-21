@@ -1,8 +1,10 @@
 package com.seapip.teunthomas.javakeep.services;
 
-import com.seapip.teunthomas.javakeep.Authorization;
 import com.seapip.teunthomas.javakeep.entities.Note;
+import com.seapip.teunthomas.javakeep.filters.Authorization;
 
+import javax.inject.Inject;
+import javax.persistence.EntityManager;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -14,7 +16,10 @@ import javax.ws.rs.core.Response;
 import java.util.List;
 
 @Path("/notes")
-public class NoteService extends Service {
+public class NoteService {
+
+    @Inject
+    public EntityManager entityManager;
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
@@ -28,7 +33,7 @@ public class NoteService extends Service {
     @Produces(MediaType.APPLICATION_JSON)
     @Authorization
     public Response getAll(@Context ContainerRequestContext requestContext) {
-        int userId = (int) requestContext.getProperty("userId");
+        long userId = (long) requestContext.getProperty("id");
         System.out.println(userId);
         List notes = entityManager.createNamedQuery("Note.getAll").getResultList();
         return Response.status(notes.size() > 0 ? 200 : 404).entity(notes).build();
