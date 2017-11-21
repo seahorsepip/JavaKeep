@@ -1,22 +1,28 @@
-package com.seapip.teun_thomas.javakeep;
+package com.seapip.teunthomas.javakeep;
 
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
+import org.glassfish.hk2.utilities.binding.AbstractBinder;
+import org.glassfish.jersey.jackson.JacksonFeature;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.servlet.ServletContainer;
 
 import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.Persistence;
-import java.io.*;
-import java.util.Date;
 
 public class Main {
 
     public static void main(String[] args) {
         ResourceConfig config = new ResourceConfig();
-        config.packages(com.seapip.teun_thomas.javakeep.services.NoteService.class.getPackage().getName());
+        config.packages(com.seapip.teunthomas.javakeep.services.Service.class.getPackage().getName());
+        config.register(new AbstractBinder() {
+            @Override
+            protected void configure() {
+                bindFactory(EntityManagerFactory.class).to(EntityManager.class);
+            }
+        });
+        config.register(new JacksonFeature());
+        config.register(new AuthorizationFilter());
         ServletHolder servlet = new ServletHolder(new ServletContainer(config));
 
         Server server = new Server(9998);
@@ -31,17 +37,5 @@ public class Main {
         } finally {
             server.destroy();
         }
-
-        /*
-        EntityManager entityManager = Persistence.createEntityManagerFactory("javaKeep").createEntityManager();
-        Note note = new Note();
-        note.setName("Test");
-        note.setContent("Eeerste test YAAAAAAY");
-        note.setDate(new Date());
-        entityManager.getTransaction().begin();
-        entityManager.persist(note);
-        entityManager.clear();
-        entityManager.getTransaction().commit();
-        */
     }
 }
