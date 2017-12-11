@@ -14,12 +14,37 @@ public class AccountJPAContext implements AccountContext {
     }
 
     @Override
-    public Accountable getById(Long id, Long accountId) {
+    public Accountable getById(Long id) {
         return entityManager
                 .createNamedQuery("Account.getById", Account.class)
                 .setParameter("id", id)
-                .setParameter("accountId", accountId)
                 .getSingleResult();
 
     }
+    
+    @Override
+    public Accountable getByEmail(String email) {
+        return entityManager
+                .createNamedQuery("Account.getByEmail", Account.class)
+                .setParameter("email", email)
+                .getSingleResult();
+    }
+    
+    @Override
+    public void delete(Long id) {
+        entityManager
+                .createNamedQuery("Account.delete", Account.class)
+                .setParameter("id",id)
+                .executeUpdate();
+    }
+    
+    @Override
+    public void update(String newEmail, String newPassword) {
+        entityManager
+                .createNamedQuery("Account.update", Account.class)
+                .setParameter("email",newEmail)
+                .setParameter("password", newPassword)
+                .executeUpdate();
+    }
+    
 }
