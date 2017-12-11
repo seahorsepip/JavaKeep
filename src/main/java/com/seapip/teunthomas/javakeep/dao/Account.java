@@ -6,9 +6,14 @@ import javax.persistence.*;
 import java.util.List;
 
 @Entity
-@NamedQuery(
-        name = "Account.getByEmail", query = "SELECT a FROM Account a WHERE a.email = :email"
-)
+@NamedQueries({
+        @NamedQuery(name = "Account.getByEmail", query = "SELECT a FROM Account a WHERE a.email = :email"),
+        @NamedQuery(name = "Account.create", query = "INSERT INTO Account(email, password) VALUES (:email, :password"),
+        @NamedQuery(name = "Account.getById", query = "SELECT a FROM Account a WHERE a.id = :id"),
+        @NamedQuery(name = "Account.delete", query = "DELETE FROM Account WHERE a.id = :id"),
+        @NamedQuery(name = "Account.update", query = "UPDATE Account SET email = :email, password = :password"),
+})
+
 public class Account implements Accountable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
