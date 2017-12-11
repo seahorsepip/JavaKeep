@@ -1,9 +1,12 @@
-package com.seapip.teun_thomas.javakeep;
+package com.seapip.teunthomas.javakeep.entities;
 
 import javax.persistence.*;
 import java.util.Date;
 
 @Entity
+@NamedQuery(
+        name="Note.getAll", query = "SELECT n.id, n.name FROM Note n"
+)
 public class Note {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -13,6 +16,10 @@ public class Note {
     private Date date;
 
     public Note() {
+    }
+
+    public Long getId() {
+        return id;
     }
 
     public String getName() {
