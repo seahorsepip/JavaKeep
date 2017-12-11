@@ -18,5 +18,18 @@ public class AccountRepository {
         return account;
     }
     
+    public Account getByEmail(String email) {
+        Accountable accountable = context.getByEmail(email);
+        Account account = new Account();
+        account.setId(accountable.getId());
+        return account;
+    }
     
+    public void delete(Long id) { 
+        context.delete(id);
+    }
+    
+    public void update(String newEmail, String newPassword) {
+        context.update(newEmail, newPassword);
+    }
 }
