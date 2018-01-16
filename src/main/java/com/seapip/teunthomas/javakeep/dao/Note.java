@@ -5,6 +5,7 @@ import com.seapip.teunthomas.javakeep.entities.Noteable;
 
 import javax.persistence.*;
 import java.util.Date;
+import java.util.List;
 
 @Entity
 @NamedQueries({
@@ -18,16 +19,26 @@ public class Note implements Noteable {
     private String title;
     private String content;
     private Date date;
+    @OneToMany(mappedBy = "note")
+    private List<SharedNote> shares;
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "`accountId`")
+    @JoinColumn(name = "accountId")
     private Account account;
 
     public Note() {
     }
 
+    public Note(Long id) {
+        this.id = id;
+    }
+
     @Override
     public Long getId() {
         return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     @Override
@@ -64,5 +75,13 @@ public class Note implements Noteable {
 
     public void setAccount(Account account) {
         this.account = account;
+    }
+
+    public List<SharedNote> getShares() {
+        return shares;
+    }
+
+    public void setShares(List<SharedNote> shares) {
+        this.shares = shares;
     }
 }

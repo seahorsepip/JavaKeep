@@ -18,8 +18,9 @@ public class Note implements Noteable{
         return id;
     }
 
-    public void setId(Long id) {
+    public Note setId(Long id) {
         this.id = id;
+        return this;
     }
 
     @Override
@@ -27,8 +28,9 @@ public class Note implements Noteable{
         return title;
     }
 
-    public void setTitle(String title) {
+    public Note setTitle(String title) {
         this.title = title;
+        return this;
     }
 
     @Override
@@ -36,8 +38,9 @@ public class Note implements Noteable{
         return content;
     }
 
-    public void setContent(String content) {
+    public Note setContent(String content) {
         this.content = content;
+        return this;
     }
 
     @Override
@@ -45,8 +48,9 @@ public class Note implements Noteable{
         return date;
     }
 
-    public void setDate(Date date) {
+    public Note setDate(Date date) {
         this.date = date;
+        return this;
     }
 
     @Override
@@ -54,7 +58,8 @@ public class Note implements Noteable{
         return account;
     }
 
-    public void setAccount(Account account) {
+    public Note setAccount(Account account) {
         this.account = account;
+        return this;
     }
 }

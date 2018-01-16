@@ -7,13 +7,21 @@ public class Account implements Accountable {
     private String email;
     private String password;
 
+    public Account() {
+    }
+
+    public Account(Long id) {
+        this.id = id;
+    }
+
     @Override
     public Long getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public Account setId(Long id) {
         this.id = id;
+        return this;
     }
 
     @Override
@@ -21,8 +29,9 @@ public class Account implements Accountable {
         return email;
     }
 
-    public void setEmail(String email) {
+    public Account setEmail(String email) {
         this.email = email;
+        return this;
     }
 
     @Override
@@ -30,7 +39,8 @@ public class Account implements Accountable {
         return password;
     }
 
-    public void setPassword(String password) {
+    public Account setPassword(String password) {
         this.password = password;
+        return this;
     }
 }

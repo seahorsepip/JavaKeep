@@ -1,7 +1,9 @@
 package com.seapip.teunthomas.javakeep;
 
+import com.seapip.teunthomas.javakeep.contexts.AccountJPAContext;
 import com.seapip.teunthomas.javakeep.contexts.NoteJPAContext;
 import com.seapip.teunthomas.javakeep.filters.AuthorizationFilter;
+import com.seapip.teunthomas.javakeep.repositories.AccountRepository;
 import com.seapip.teunthomas.javakeep.repositories.NoteRepository;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.servlet.DefaultServlet;
@@ -20,6 +22,7 @@ public class Main {
     public static void main(String[] args) {
         EntityManager entityManager = Persistence.createEntityManagerFactory("javaKeep").createEntityManager();
         NoteRepository noteRepository = new NoteRepository(new NoteJPAContext(entityManager));
+        AccountRepository accountRepository = new AccountRepository(new AccountJPAContext(entityManager));
 
         ResourceConfig config = new ResourceConfig();
         config.packages(com.seapip.teunthomas.javakeep.services.NoteService.class.getPackage().getName());
@@ -33,6 +36,12 @@ public class Main {
             @Override
             protected void configure() {
                 bind(noteRepository).to(NoteRepository.class);
+            }
+        });
+        config.register(new AbstractBinder() {
+            @Override
+            protected void configure() {
+                bind(accountRepository).to(AccountRepository.class);
             }
         });
         config.register(new JacksonFeature());
