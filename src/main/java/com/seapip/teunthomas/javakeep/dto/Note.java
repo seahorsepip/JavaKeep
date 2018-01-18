@@ -1,12 +1,11 @@
 package com.seapip.teunthomas.javakeep.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.seapip.teunthomas.javakeep.entities.Noteable;
 
 import java.util.Date;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class Note implements Noteable{
+public class Note implements com.seapip.teunthomas.javakeep.entities.Noteable {
     private Long id;
     private String title;
     private String content;

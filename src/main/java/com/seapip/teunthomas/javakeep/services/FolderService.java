@@ -18,7 +18,7 @@ import java.util.UUID;
 @Path("/notes")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
-public class NoteService {
+public class FolderService {
 
     @Inject
     private NoteRepository repository;

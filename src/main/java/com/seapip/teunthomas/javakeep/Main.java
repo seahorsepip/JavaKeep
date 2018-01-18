@@ -15,40 +15,30 @@ import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.servlet.ServletContainer;
 
 import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 
 public class Main {
 
     public static void main(String[] args) {
-        EntityManager entityManager = Persistence.createEntityManagerFactory("javaKeep").createEntityManager();
-        NoteRepository noteRepository = new NoteRepository(new NoteJPAContext(entityManager));
-        AccountRepository accountRepository = new AccountRepository(new AccountJPAContext(entityManager));
+        EntityManagerFactory entityManagerFactory = Persistence.createEntityManagerFactory("javaKeep");
+        NoteRepository noteRepository = new NoteRepository(new NoteJPAContext(entityManagerFactory));
+        AccountRepository accountRepository = new AccountRepository(new AccountJPAContext(entityManagerFactory));
 
         ResourceConfig config = new ResourceConfig();
         config.packages(com.seapip.teunthomas.javakeep.services.NoteService.class.getPackage().getName());
         config.register(new AbstractBinder() {
             @Override
             protected void configure() {
-                bind(entityManager).to(EntityManager.class);
-            }
-        });
-        config.register(new AbstractBinder() {
-            @Override
-            protected void configure() {
-                bind(noteRepository).to(NoteRepository.class);
-            }
-        });
-        config.register(new AbstractBinder() {
-            @Override
-            protected void configure() {
                 bind(accountRepository).to(AccountRepository.class);
+                bind(noteRepository).to(NoteRepository.class);
             }
         });
         config.register(new JacksonFeature());
         config.register(new AuthorizationFilter());
         ServletHolder apiServlet = new ServletHolder(new ServletContainer(config));
 
-        ServletHolder defaultServlet = new ServletHolder("default",  new DefaultServlet());
+        ServletHolder defaultServlet = new ServletHolder("default", new DefaultServlet());
         defaultServlet.setInitParameter("resourceBase", "./web");
 
         Server server = new Server(9998);

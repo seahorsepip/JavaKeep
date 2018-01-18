@@ -35,7 +35,8 @@ public class SharedNote implements Shareable {
         return note;
     }
 
-    public void setNote(Note note) {
+    public SharedNote setNote(Note note) {
         this.note = note;
+        return this;
     }
 }

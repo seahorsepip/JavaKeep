@@ -17,4 +17,5 @@ dependencies {
     compile group: 'org.glassfish.jersey.media', name: 'jersey-media-json-jackson', version: '2.26'
     compile group: 'org.eclipse.jetty', name: 'jetty-server', version: '9.4.7.v20170914'
     compile group: 'org.eclipse.jetty', name: 'jetty-servlet', version: '9.4.7.v20170914'
+    compile 'de.mkammerer:argon2-jvm:2.3'
 }

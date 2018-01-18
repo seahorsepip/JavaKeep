@@ -1,6 +1,7 @@
 package com.seapip.teunthomas.javakeep.repositories;
 
 import com.seapip.teunthomas.javakeep.contexts.NoteContext;
+import com.seapip.teunthomas.javakeep.dto.Account;
 import com.seapip.teunthomas.javakeep.dto.Note;
 import com.seapip.teunthomas.javakeep.dto.SharedNote;
 import com.seapip.teunthomas.javakeep.entities.Noteable;
@@ -17,34 +18,33 @@ public class NoteRepository {
         this.context = context;
     }
 
-    public Note create(Noteable noteable) {
-        Noteable n = context.create(noteable);
-        Note note = new Note();
-        note.setId(n.getId());
-        note.setTitle(n.getTitle());
-        note.setContent(n.getContent());
-        note.setDate(n.getDate());
-        return note;
+    public Note create(Note note, Long accountId) {
+        note.setAccount(new Account(accountId));
+        Noteable noteable = context.create(note);
+        return new Note()
+                .setId(noteable.getId())
+                .setTitle(noteable.getTitle())
+                .setContent(noteable.getContent())
+                .setDate(noteable.getDate());
     }
 
     public Note getById(Long id, Long accountId) {
         Noteable noteable = context.getById(id, accountId);
-        Note note = new Note();
-        note.setId(noteable.getId());
-        note.setTitle(noteable.getTitle());
-        note.setContent(noteable.getContent());
-        note.setDate(noteable.getDate());
-        return note;
+        return new Note()
+                .setId(noteable.getId())
+                .setTitle(noteable.getTitle())
+                .setContent(noteable.getContent())
+                .setDate(noteable.getDate());
     }
 
     public List<Note> getAll(Long accountId) {
         List<? extends Noteable> noteables = context.getAll(accountId);
         List<Note> notes = new ArrayList<>();
         for (Noteable noteable : noteables) {
-            Note note = new Note();
-            note.setId(noteable.getId());
-            note.setTitle(noteable.getTitle());
-            notes.add(note);
+            notes.add(new Note()
+                    .setId(noteable.getId())
+                    .setTitle(noteable.getTitle())
+            );
         }
         return notes;
     }
@@ -55,14 +55,25 @@ public class NoteRepository {
 
     public SharedNote getByToken(UUID token) {
         Shareable shareable = context.getByToken(token);
-        SharedNote sharedNote = new SharedNote();
-        Note note = new Note();
-        note.setTitle(shareable.getNote().getTitle());
-        note.setContent(shareable.getNote().getContent());
-        note.setDate(shareable.getNote().getDate());
-        sharedNote.setNote(note);
-        sharedNote.setPermission(shareable.getPermission());
-        sharedNote.setToken(token);
-        return sharedNote;
+        return new SharedNote()
+                .setNote(new Note()
+                        .setTitle(shareable.getNote().getTitle())
+                        .setContent(shareable.getNote().getContent())
+                        .setDate(shareable.getNote().getDate())
+                )
+                .setPermission(shareable.getPermission())
+                .setToken(token);
+    }
+
+    public void update(Note note, Long accountId) {
+        context.update(note, accountId);
+    }
+
+    public void update(Note note, UUID token) {
+        context.update(note, token);
+    }
+
+    public void delete(Long id, Long accountId) {
+        context.delete(id, accountId);
     }
 }

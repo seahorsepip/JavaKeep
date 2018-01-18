@@ -1,22 +1,70 @@
 package com.seapip.teunthomas.javakeep.contexts;
 
 import com.seapip.teunthomas.javakeep.dao.Account;
-import com.seapip.teunthomas.javakeep.dao.Note;
-import com.seapip.teunthomas.javakeep.entities.Noteable;
+import com.seapip.teunthomas.javakeep.dao.Folder;
+import com.seapip.teunthomas.javakeep.entities.Folderable;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
-import java.util.Date;
-import java.util.List;
 
-public class NoteJPAContext extends JPAContext implements NoteContext {
+public class FolderJPAContext extends JPAContext implements FolderContext {
 
-    public NoteJPAContext(EntityManagerFactory entityManagerFactory) {
+    public FolderJPAContext(EntityManagerFactory entityManagerFactory) {
         super(entityManagerFactory);
+        accountJPAContext = new AccountJPAContext(entityManagerFactory);
+    }
+
+    private AccountJPAContext accountJPAContext;
+
+    @Override
+    public Folder create(Folderable folderable, Long accountId) {
+        Folder folder = new Folder();
+        folder.setName(folderable.getName());
+        folder.getAccounts().add(new Account(accountId));
+        EntityManager entityManager = getEntityManager();
+        entityManager.getTransaction().begin();
+        entityManager.persist(folder);
+        entityManager.getTransaction().commit();
+        entityManager.close();
+        return folder;
     }
 
     @Override
-    public Note create(Noteable noteable) {
+    public Folder getById(Long id, Long accountId) {
+        EntityManager entityManager = getEntityManager();
+        Folder folder = entityManager
+                .createNamedQuery("Folder.getByAccount", Folder.class)
+                .setParameter("id",id)
+                .setParameter("account", new Account(accountId))
+                .getSingleResult();
+        entityManager.close();
+        return folder;
+    }
+
+    @Override
+    public void share(Long id, String email, Long accountId) {
+        Folder folder = getById(id, accountId);
+        Account account = accountJPAContext.getByEmail(email);
+        EntityManager entityManager = getEntityManager();
+        entityManager.getTransaction().begin();
+        folder.getAccounts().add(account);
+        entityManager.getTransaction().commit();
+        entityManager.close();
+    }
+
+    @Override
+    public void update(Folderable folderable, Long accountId) {
+
+    }
+
+    @Override
+    public void delete(Long id, Long accountId) {
+
+    }
+
+    /*
+    @Override
+    public Folder create(Folderable noteable) {
         Note note = new Note();
         note.setTitle(noteable.getTitle());
         note.setContent(noteable.getContent());
@@ -53,7 +101,6 @@ public class NoteJPAContext extends JPAContext implements NoteContext {
         return notes;
     }
 
-    /*
     @Override
     public UUID share(Long id, Shareable.Permission permission, Long accountId) {
         SharedNote sharedNote = new SharedNote();
@@ -76,7 +123,7 @@ public class NoteJPAContext extends JPAContext implements NoteContext {
                 .getSingleResult();
         entityManager.close();
         return sharedNote;
-    }*/
+    }
 
     @Override
     public void update(Noteable noteable, Long accountId) {
@@ -90,7 +137,6 @@ public class NoteJPAContext extends JPAContext implements NoteContext {
         entityManager.close();
     }
 
-    /*
     @Override
     public void update(Noteable noteable, UUID token) {
         SharedNote sharedNote = getByToken(token);
@@ -101,7 +147,7 @@ public class NoteJPAContext extends JPAContext implements NoteContext {
         sharedNote.getNote().setDate(new Date());
         entityManager.getTransaction().commit();
         entityManager.close();
-    }*/
+    }
 
     @Override
     public void delete(Long id, Long accountId) {
@@ -112,5 +158,5 @@ public class NoteJPAContext extends JPAContext implements NoteContext {
                 .setParameter("accountId", accountId)
                 .getSingleResult();
         entityManager.close();
-    }
+    }*/
 }

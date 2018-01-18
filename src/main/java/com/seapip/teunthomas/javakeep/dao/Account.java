@@ -1,6 +1,7 @@
 package com.seapip.teunthomas.javakeep.dao;
 
 import com.seapip.teunthomas.javakeep.entities.Accountable;
+import com.seapip.teunthomas.javakeep.entities.Folderable;
 
 import javax.persistence.*;
 import java.util.List;
@@ -20,9 +21,10 @@ public class Account implements Accountable {
     @Column(unique = true)
     private String email;
     private String password;
-
     @OneToMany(mappedBy="account")
     private List<Note> notes;
+    @ManyToMany
+    private List<Folder> folders;
 
 
     public Account() {
@@ -50,5 +52,10 @@ public class Account implements Accountable {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    @Override
+    public List<? extends Folderable> getFolders() {
+        return folders;
     }
 }

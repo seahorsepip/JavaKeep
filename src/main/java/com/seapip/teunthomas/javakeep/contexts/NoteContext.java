@@ -1,10 +1,8 @@
 package com.seapip.teunthomas.javakeep.contexts;
 
 import com.seapip.teunthomas.javakeep.entities.Noteable;
-import com.seapip.teunthomas.javakeep.entities.Shareable;
 
 import java.util.List;
-import java.util.UUID;
 
 public interface NoteContext {
     Noteable create(Noteable noteable);
@@ -13,7 +11,13 @@ public interface NoteContext {
 
     List<? extends Noteable> getAll(Long accountId);
 
-    UUID share(Long id, Shareable.Permission permission, Long accountId);
+    //UUID share(Long id, Shareable.Permission permission, Long accountId);
 
-    Shareable getByToken(UUID token);
+    //Shareable getByToken(UUID token);
+
+    void update(Noteable noteable, Long accountId);
+
+    //void update(Noteable noteable, UUID token);
+
+    void delete(Long id, Long accountId);
 }

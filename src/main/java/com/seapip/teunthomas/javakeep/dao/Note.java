@@ -1,7 +1,6 @@
 package com.seapip.teunthomas.javakeep.dao;
 
 import com.seapip.teunthomas.javakeep.entities.Accountable;
-import com.seapip.teunthomas.javakeep.entities.Noteable;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -10,20 +9,23 @@ import java.util.List;
 @Entity
 @NamedQueries({
         @NamedQuery(name = "Note.getById", query = "SELECT n FROM Note n WHERE n.id = :id AND n.account.id = :accountId"),
-        @NamedQuery(name = "Note.getAll", query = "SELECT n FROM Note n WHERE n.account.id = :accountId")
+        @NamedQuery(name = "Note.getAll", query = "SELECT n FROM Note n WHERE n.account.id = :accountId"),
+        @NamedQuery(name = "Note.delete", query = "DELETE FROM Note n WHERE n.id = :id AND n.account.id = :accountId")
 })
-public class Note implements Noteable {
+public class Note implements com.seapip.teunthomas.javakeep.entities.Noteable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String title;
     private String content;
     private Date date;
-    @OneToMany(mappedBy = "note")
-    private List<SharedNote> shares;
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "accountId")
     private Account account;
+    @ManyToOne
+    @JoinColumn(name = "folderId")
+    private Folder folder;
+
 
     public Note() {
     }
@@ -75,13 +77,5 @@ public class Note implements Noteable {
 
     public void setAccount(Account account) {
         this.account = account;
-    }
-
-    public List<SharedNote> getShares() {
-        return shares;
-    }
-
-    public void setShares(List<SharedNote> shares) {
-        this.shares = shares;
     }
 }
