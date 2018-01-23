@@ -61,4 +61,13 @@ public class Note implements com.seapip.teunthomas.javakeep.entities.Noteable {
         this.account = account;
         return this;
     }
+
+    public Type getType() {
+        return Type.PLAINTEXT;
+    }
+
+    public enum Type {
+        PLAINTEXT,
+        ENCRYPTED
+    }
 }

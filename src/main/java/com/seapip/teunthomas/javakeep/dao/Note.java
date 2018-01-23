@@ -12,6 +12,7 @@ import java.util.List;
         @NamedQuery(name = "Note.getAll", query = "SELECT n FROM Note n WHERE n.account.id = :accountId"),
         @NamedQuery(name = "Note.delete", query = "DELETE FROM Note n WHERE n.id = :id AND n.account.id = :accountId")
 })
+@Inheritance(strategy= InheritanceType.SINGLE_TABLE)
 public class Note implements com.seapip.teunthomas.javakeep.entities.Noteable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -73,6 +74,11 @@ public class Note implements com.seapip.teunthomas.javakeep.entities.Noteable {
     @Override
     public Accountable getAccount() {
         return account;
+    }
+
+    @Override
+    public com.seapip.teunthomas.javakeep.dto.Note.Type getType() {
+        return null;
     }
 
     public void setAccount(Account account) {

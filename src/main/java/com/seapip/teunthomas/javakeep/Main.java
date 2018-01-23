@@ -1,9 +1,11 @@
 package com.seapip.teunthomas.javakeep;
 
 import com.seapip.teunthomas.javakeep.contexts.AccountJPAContext;
+import com.seapip.teunthomas.javakeep.contexts.FolderJPAContext;
 import com.seapip.teunthomas.javakeep.contexts.NoteJPAContext;
 import com.seapip.teunthomas.javakeep.filters.AuthorizationFilter;
 import com.seapip.teunthomas.javakeep.repositories.AccountRepository;
+import com.seapip.teunthomas.javakeep.repositories.FolderRepository;
 import com.seapip.teunthomas.javakeep.repositories.NoteRepository;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.servlet.DefaultServlet;
@@ -14,7 +16,6 @@ import org.glassfish.jersey.jackson.JacksonFeature;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.servlet.ServletContainer;
 
-import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 
@@ -22,8 +23,9 @@ public class Main {
 
     public static void main(String[] args) {
         EntityManagerFactory entityManagerFactory = Persistence.createEntityManagerFactory("javaKeep");
-        NoteRepository noteRepository = new NoteRepository(new NoteJPAContext(entityManagerFactory));
         AccountRepository accountRepository = new AccountRepository(new AccountJPAContext(entityManagerFactory));
+        NoteRepository noteRepository = new NoteRepository(new NoteJPAContext(entityManagerFactory));
+        FolderRepository folderRepository = new FolderRepository(new FolderJPAContext(entityManagerFactory));
 
         ResourceConfig config = new ResourceConfig();
         config.packages(com.seapip.teunthomas.javakeep.services.NoteService.class.getPackage().getName());
@@ -32,6 +34,7 @@ public class Main {
             protected void configure() {
                 bind(accountRepository).to(AccountRepository.class);
                 bind(noteRepository).to(NoteRepository.class);
+                bind(folderRepository).to(FolderRepository.class);
             }
         });
         config.register(new JacksonFeature());

@@ -6,6 +6,8 @@ import com.seapip.teunthomas.javakeep.entities.Folderable;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
+import java.util.ArrayList;
+import java.util.List;
 
 public class FolderJPAContext extends JPAContext implements FolderContext {
 
@@ -20,7 +22,9 @@ public class FolderJPAContext extends JPAContext implements FolderContext {
     public Folder create(Folderable folderable, Long accountId) {
         Folder folder = new Folder();
         folder.setName(folderable.getName());
-        folder.getAccounts().add(new Account(accountId));
+        List<Account> accounts = new ArrayList<>();
+        accounts.add(new Account(accountId));
+        folder.setAccounts(accounts);
         EntityManager entityManager = getEntityManager();
         entityManager.getTransaction().begin();
         entityManager.persist(folder);
@@ -42,12 +46,24 @@ public class FolderJPAContext extends JPAContext implements FolderContext {
     }
 
     @Override
+    public List<? extends Folderable> getAll(Long accountId) {
+        EntityManager entityManager = getEntityManager();
+        List<Folder> folders = entityManager
+                .createNamedQuery("Folder.getAll", Folder.class)
+                .setParameter("account", new Account(accountId))
+                .getResultList();
+        entityManager.close();
+        return folders;
+    }
+
+    @Override
     public void share(Long id, String email, Long accountId) {
         Folder folder = getById(id, accountId);
         Account account = accountJPAContext.getByEmail(email);
+        folder.getAccounts().add(account);
         EntityManager entityManager = getEntityManager();
         entityManager.getTransaction().begin();
-        folder.getAccounts().add(account);
+        entityManager.merge(folder);
         entityManager.getTransaction().commit();
         entityManager.close();
     }

@@ -1,6 +1,7 @@
 package com.seapip.teunthomas.javakeep.contexts;
 
 import com.seapip.teunthomas.javakeep.dao.Account;
+import com.seapip.teunthomas.javakeep.dao.EncryptedNote;
 import com.seapip.teunthomas.javakeep.dao.Note;
 import com.seapip.teunthomas.javakeep.entities.Noteable;
 
@@ -17,14 +18,20 @@ public class NoteJPAContext extends JPAContext implements NoteContext {
 
     @Override
     public Note create(Noteable noteable) {
-        Note note = new Note();
+        boolean encrypted = noteable.getType() == com.seapip.teunthomas.javakeep.dto.Note.Type.ENCRYPTED;
+        System.out.println(encrypted);
+        Note note = encrypted ? new EncryptedNote() : new Note();
         note.setTitle(noteable.getTitle());
-        note.setContent(noteable.getContent());
+        if (encrypted) {
+            ((EncryptedNote) note).setEncryptedContent(((com.seapip.teunthomas.javakeep.dto.EncryptedNote) noteable).getEncryptedContent());
+        } else {
+            note.setContent(noteable.getContent());
+        }
         note.setDate(noteable.getDate());
         note.setAccount(new Account(noteable.getAccount().getId()));
         EntityManager entityManager = getEntityManager();
         entityManager.getTransaction().begin();
-        entityManager.persist(note);
+        entityManager.persist(encrypted ? (EncryptedNote) note : note);
         entityManager.getTransaction().commit();
         entityManager.close();
         return note;
@@ -82,10 +89,11 @@ public class NoteJPAContext extends JPAContext implements NoteContext {
     public void update(Noteable noteable, Long accountId) {
         Note note = getById(noteable.getId(), accountId);
         EntityManager entityManager = getEntityManager();
-        entityManager.getTransaction().begin();
         note.setTitle(noteable.getTitle());
         note.setContent(noteable.getContent());
         note.setDate(new Date());
+        entityManager.getTransaction().begin();
+        entityManager.merge(note);
         entityManager.getTransaction().commit();
         entityManager.close();
     }
@@ -106,11 +114,13 @@ public class NoteJPAContext extends JPAContext implements NoteContext {
     @Override
     public void delete(Long id, Long accountId) {
         EntityManager entityManager = getEntityManager();
+        entityManager.getTransaction().begin();
         entityManager
-                .createNamedQuery("Note.delete", Note.class)
+                .createNamedQuery("Note.delete")
                 .setParameter("id", id)
                 .setParameter("accountId", accountId)
-                .getSingleResult();
+                .executeUpdate();
+        entityManager.getTransaction().commit();
         entityManager.close();
     }
 }

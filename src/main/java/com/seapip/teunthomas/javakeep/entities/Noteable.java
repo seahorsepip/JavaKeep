@@ -1,6 +1,7 @@
 package com.seapip.teunthomas.javakeep.entities;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.seapip.teunthomas.javakeep.dto.Note;
 
 import java.util.Date;
 
@@ -16,4 +17,6 @@ public interface Noteable {
     Date getDate();
 
     Accountable getAccount();
+
+    Note.Type getType();
 }

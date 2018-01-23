@@ -1,11 +1,15 @@
 package com.seapip.teunthomas.javakeep.dto;
 
 import com.seapip.teunthomas.javakeep.entities.Accountable;
+import com.seapip.teunthomas.javakeep.entities.Folderable;
+
+import java.util.List;
 
 public class Account implements Accountable {
     private Long id;
     private String email;
     private String password;
+    private List<Folder> folders;
 
     public Account() {
     }
@@ -37,6 +41,11 @@ public class Account implements Accountable {
     @Override
     public String getPassword() {
         return password;
+    }
+
+    @Override
+    public List<? extends Folderable> getFolders() {
+        return folders;
     }
 
     public Account setPassword(String password) {

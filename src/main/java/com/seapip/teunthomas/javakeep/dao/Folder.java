@@ -1,6 +1,8 @@
 package com.seapip.teunthomas.javakeep.dao;
 
 import com.seapip.teunthomas.javakeep.entities.Folderable;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 
 import javax.persistence.*;
 import java.util.List;
@@ -8,6 +10,7 @@ import java.util.List;
 @Entity
 @NamedQueries({
         @NamedQuery(name = "Folder.getByAccount", query = "SELECT f FROM Folder f WHERE f.id = :id AND :account MEMBER OF f.accounts"),
+        @NamedQuery(name = "Folder.getAll", query = "SELECT f FROM Folder f WHERE :account MEMBER OF f.accounts"),
         @NamedQuery(name = "Folder.delete", query = "DELETE FROM Folder f WHERE f.id = :id AND :account MEMBER OF f.accounts")
 })
 public class Folder implements Folderable {
@@ -15,9 +18,10 @@ public class Folder implements Folderable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String name;
-    @OneToMany(mappedBy = "folder")
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "folder")
     private List<Note> notes;
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
+    @Fetch(value = FetchMode.SUBSELECT)
     private List<Account> accounts;
 
     @Override
@@ -42,5 +46,9 @@ public class Folder implements Folderable {
     @Override
     public List<Account> getAccounts() {
         return accounts;
+    }
+
+    public void setAccounts(List<Account> accounts) {
+        this.accounts = accounts;
     }
 }

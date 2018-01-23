@@ -1,0 +1,105 @@
+<html>
+<head>
+
+</head>
+<body>
+<button class="create-note">Create note</button>
+<ul class="data"></ul>
+<form class="note-editor" style="display: none;">
+    <input type="text" placeholder="Title">
+    <textarea placeholder="Content"></textarea>
+    <input type="text" placeholder="Password">
+    <button>Save</button>
+</form>
+<script>
+    const data = document.querySelector('.data');
+    const createNote = document.querySelector('.create-note');
+    const noteEditor = document.querySelector('.note-editor');
+
+    fetchData();
+
+    data.addEventListener('click', e => {
+        if (e.target) {
+            if (e.target.matches('.note')) {
+                noteEditor.style.display = 'block';
+                fetch(`api/notes/${e.target.dataset.id}`, {
+                    headers: {
+                        Authorization: `Basic ${btoa('thomas@email.com:secret')}`
+                    }
+                })
+                    .then(response => response.json())
+                    .then(note => {
+                        noteEditor.dataset.id = note.id;
+                        noteEditor.querySelector('input:first-of-type').value = note.title;
+                        noteEditor.querySelector('textarea').value = note.content;
+                    });
+            }
+            if (e.target.matches('.delete-note')) {
+                fetch(`api/notes/${e.target.parentNode.dataset.id}`, {
+                    method: "DELETE",
+                    headers: {
+                        Authorization: `Basic ${btoa('thomas@email.com:secret')}`
+                    }
+                })
+                    .then(() => fetchData())
+            }
+        }
+    });
+
+    createNote.addEventListener('click', e => noteEditor.style.display = 'block');
+
+    noteEditor.addEventListener('submit', e => {
+        e.preventDefault();
+        let pw = noteEditor.querySelector('input:first-of-type').value;
+
+        fetch(`api/notes/${noteEditor.dataset.id ? noteEditor.dataset.id : ''}?password=${pw ? pw : ''}`, {
+            method: 'POST',
+            headers: {
+                Authorization: `Basic ${btoa('thomas@email.com:secret')}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                title: noteEditor.querySelector('input:first-of-type').value,
+                content: noteEditor.querySelector('textarea').value
+            })
+        });
+        delete noteEditor.dataset.id;
+        noteEditor.reset();
+        noteEditor.style.display = 'none';
+        fetchData();
+    });
+
+    function fetchData() {
+        Promise.resolve()
+        //Get folders
+            .then(() => fetch('api/folders', {
+                headers: {
+                    Authorization: `Basic ${btoa('thomas@email.com:secret')}`
+                }
+            }))
+            .then(response => response.json())
+            .then(folders => {
+                let html = '';
+                folders.forEach(folder => {
+                    html += `<li data-id="${folder.id}" class="folder">Folder: ${folder.name}</li>`;
+                });
+                data.innerHTML = html;
+            })
+            //Get notes
+            .then(() => fetch('api/notes', {
+                headers: {
+                    Authorization: `Basic ${btoa('thomas@email.com:secret')}`
+                }
+            }))
+            .then(response => response.json())
+            .then(notes => {
+                let html = '';
+                notes.forEach(note => {
+                    html += `<li data-id="${note.id}" class="note">Note: ${note.title} <button class="delete-note">Delete</button></li>`;
+                });
+                data.innerHTML += html;
+            });
+    }
+</script>
+</body>
+</html>
