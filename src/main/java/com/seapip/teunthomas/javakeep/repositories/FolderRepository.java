@@ -86,9 +86,9 @@ public class FolderRepository {
     public void update(Note note, UUID token) {
         context.update(note, token);
     }
+    */
 
     public void delete(Long id, Long accountId) {
         context.delete(id, accountId);
     }
-    */
 }

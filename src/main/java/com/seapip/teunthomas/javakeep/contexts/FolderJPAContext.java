@@ -75,7 +75,15 @@ public class FolderJPAContext extends JPAContext implements FolderContext {
 
     @Override
     public void delete(Long id, Long accountId) {
-
+        EntityManager entityManager = getEntityManager();
+        entityManager.getTransaction().begin();
+        entityManager
+                .createNamedQuery("Folder.delete")
+                .setParameter("id", id)
+                .setParameter("account", new Account(accountId))
+                .executeUpdate();
+        entityManager.getTransaction().commit();
+        entityManager.close();
     }
 
     /*

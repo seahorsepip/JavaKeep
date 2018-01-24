@@ -77,12 +77,12 @@
             margin: 12px 8px 0 0;
         }
 
-        ul.data li .delete-note {
+        ul.data li button {
             float: right;
             height: 36px;
             line-height: 36px;
             padding: 0 10px;
-            margin-top: 8px;
+            margin: 8px;
             font-size: 12px;
         }
 
@@ -117,6 +117,11 @@
             line-height: 48px;
             float: right;
             margin-right: 20px;
+        }
+
+        .data h3 {
+            margin-top: 48px;
+            margin-left: 48px;
         }
     </style>
 </head>
@@ -276,6 +281,24 @@
                 })
                     .then(() => fetchData())
             }
+            if (e.target.matches('.share-folder')) {
+                fetch(`api/folders/${e.target.parentNode.dataset.id}/share?email=${prompt('Email')}`, {
+                    method: "POST",
+                    headers: {
+                        Authorization: localStorage.getItem('token')
+                    }
+                })
+                    .then(() => fetchData())
+            }
+            if (e.target.matches('.delete-folder')) {
+                fetch(`api/folders/${e.target.parentNode.dataset.id}`, {
+                    method: "DELETE",
+                    headers: {
+                        Authorization: localStorage.getItem('token')
+                    }
+                })
+                    .then(() => fetchData())
+            }
         }
     });
 
@@ -295,10 +318,25 @@
                 title: noteEditor.querySelector('input:first-of-type').value,
                 content: noteEditor.querySelector('textarea').value
             })
-        });
+        }).then(() => fetchData())
         delete noteEditor.dataset.id;
         noteEditor.reset();
-        fetchData();
+    });
+
+    folderEditor.addEventListener('submit', e => {
+        console.log('submit');
+        fetch(`api/folders/${folderEditor.dataset.id ? folderEditor.dataset.id : ''}`, {
+            method: 'POST',
+            headers: {
+                Authorization: localStorage.getItem('token'),
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                name: folderEditor.querySelector('input').value,
+            })
+        }).then(() => fetchData())
+        delete folderEditor.dataset.id;
+        folderEditor.reset();
     });
 
     function fetchData() {
@@ -311,9 +349,9 @@
             }))
             .then(response => response.json())
             .then(folders => {
-                let html = '';
-                folders.forEach(folder => {
-                    html += `<li data-id="${folder.id}" class="folder">Folder: ${folder.name}</li>`;
+                let html = folders.length ? '<h3>Folders</h3>' : '';
+                folders.reverse().forEach(folder => {
+                    html += `<li data-id="${folder.id}" class="folder"><i class="material-icons">folder</i> ${folder.name} <button class="delete-folder">Delete</button><button class="share-folder">Share</button></li>`;
                 });
                 data.innerHTML = html;
             })
@@ -325,9 +363,9 @@
             }))
             .then(response => response.json())
             .then(notes => {
-                let html = '';
+                let html = notes.length ? '<h3>Notes</h3>' : '';
                 notes.reverse().forEach(note => {
-                    html += `<li data-id="${note.id}" data-type="${note.type}" class="note"><i class="material-icons">insert_drive_file</i> ${note.title} <button class="delete-note">Delete</button></li>`;
+                    html += `<li data-id="${note.id}" data-type="${note.type}" class="note">${note.type == 'ENCRYPTED' ? '<i class="material-icons">lock</i>' : '<i class="material-icons">insert_drive_file</i>'} ${note.title} <button class="delete-note">Delete</button></li>`;
                 });
                 data.innerHTML += html;
             })

@@ -72,7 +72,7 @@ public class FolderService {
         repository.update(note, UUID.fromString(token));
         return Response.status(200).build();
     }
-
+*/
     @DELETE
     @Path("{id}")
     @Authorization
@@ -80,5 +80,4 @@ public class FolderService {
         repository.delete(id, (Long) requestContext.getProperty("id"));
         return Response.status(200).build();
     }
-    */
 }
