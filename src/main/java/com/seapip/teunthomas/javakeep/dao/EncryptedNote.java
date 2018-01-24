@@ -13,4 +13,9 @@ public class EncryptedNote extends Note {
     public void setEncryptedContent(String encryptedContent) {
         this.encryptedContent = encryptedContent;
     }
+
+    @Override
+    public com.seapip.teunthomas.javakeep.dto.Note.Type getType() {
+        return com.seapip.teunthomas.javakeep.dto.Note.Type.ENCRYPTED;
+    }
 }

@@ -21,18 +21,23 @@
     data.addEventListener('click', e => {
         if (e.target) {
             if (e.target.matches('.note')) {
-                noteEditor.style.display = 'block';
-                fetch(`api/notes/${e.target.dataset.id}`, {
+                let password = '';
+                if(e.target.dataset.type == "ENCRYPTED") {
+                    password = prompt('Enter password')
+                }
+                fetch(`api/notes/${e.target.dataset.id}?password=${password}`, {
                     headers: {
                         Authorization: `Basic ${btoa('thomas@email.com:secret')}`
                     }
                 })
                     .then(response => response.json())
                     .then(note => {
+                        noteEditor.style.display = 'block';
                         noteEditor.dataset.id = note.id;
                         noteEditor.querySelector('input:first-of-type').value = note.title;
                         noteEditor.querySelector('textarea').value = note.content;
-                    });
+                    })
+                    .catch(e => alert('Incorrect password'));
             }
             if (e.target.matches('.delete-note')) {
                 fetch(`api/notes/${e.target.parentNode.dataset.id}`, {
@@ -50,7 +55,7 @@
 
     noteEditor.addEventListener('submit', e => {
         e.preventDefault();
-        let pw = noteEditor.querySelector('input:first-of-type').value;
+        let pw = noteEditor.querySelector('input:last-of-type').value;
 
         fetch(`api/notes/${noteEditor.dataset.id ? noteEditor.dataset.id : ''}?password=${pw ? pw : ''}`, {
             method: 'POST',
@@ -95,7 +100,7 @@
             .then(notes => {
                 let html = '';
                 notes.forEach(note => {
-                    html += `<li data-id="${note.id}" class="note">Note: ${note.title} <button class="delete-note">Delete</button></li>`;
+                    html += `<li data-id="${note.id}" data-type="${note.type}" class="note">Note: ${note.title} <button class="delete-note">Delete</button></li>`;
                 });
                 data.innerHTML += html;
             });

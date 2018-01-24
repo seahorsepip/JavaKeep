@@ -27,12 +27,12 @@ public class NoteRepository {
                 .setDate(noteable.getDate());
     }
 
-    public Note getById(Long id, Long accountId) {
+    public Note getById(Long id, Long accountId, String password) {
         Noteable noteable = context.getById(id, accountId);
         return new Note()
                 .setId(noteable.getId())
                 .setTitle(noteable.getTitle())
-                .setContent(noteable.getContent())
+                .setContent(noteable.getType() == Note.Type.ENCRYPTED ? decrypt((com.seapip.teunthomas.javakeep.dao.EncryptedNote) noteable, password) : noteable.getContent())
                 .setDate(noteable.getDate());
     }
 
@@ -40,7 +40,7 @@ public class NoteRepository {
         List<? extends Noteable> noteables = context.getAll(accountId);
         List<Note> notes = new ArrayList<>();
         for (Noteable noteable : noteables) {
-            notes.add(new Note()
+            notes.add((noteable.getType() == Note.Type.ENCRYPTED ? new EncryptedNote() : new Note())
                     .setId(noteable.getId())
                     .setTitle(noteable.getTitle())
             );
@@ -48,34 +48,10 @@ public class NoteRepository {
         return notes;
     }
 
-    /*
-
-    public UUID share(Long id, Shareable.Permission permission, Long accountId) {
-        return context.share(id, permission, accountId);
-    }
-
-    public SharedNote getByToken(UUID token) {
-        Shareable shareable = context.getByToken(token);
-        return new SharedNote()
-                .setNote(new Note()
-                        .setTitle(shareable.getNote().getTitle())
-                        .setContent(shareable.getNote().getContent())
-                        .setDate(shareable.getNote().getDate())
-                )
-                .setPermission(shareable.getPermission())
-                .setToken(token);
-    }
-    */
-
     public void update(Note note, Long accountId, String password) {
-        if(!password.equals("")) context.update(note, accountId); else context.update(encrypt(note, password), accountId);
+        if (password.equals("")) context.update(note, accountId);
+        else context.update(encrypt(note, password), accountId);
     }
-
-    /*
-    public void update(Note note, UUID token) {
-        context.update(note, token);
-    }
-    */
 
     public void delete(Long id, Long accountId) {
         context.delete(id, accountId);
@@ -84,9 +60,16 @@ public class NoteRepository {
     private EncryptedNote encrypt(Note note, String password) {
         BasicTextEncryptor textEncryptor = new BasicTextEncryptor();
         textEncryptor.setPassword(password);
-        return (EncryptedNote) ((EncryptedNote) new EncryptedNote()
-                .setTitle(note.getTitle()))
+        return (EncryptedNote) new EncryptedNote()
                 .setEncryptedContent(textEncryptor.encrypt(note.getContent()))
+                .setId(note.getId())
+                .setTitle(note.getTitle())
                 .setAccount(note.getAccount());
+    }
+
+    private String decrypt(com.seapip.teunthomas.javakeep.dao.EncryptedNote encryptedNote, String password) {
+        BasicTextEncryptor textEncryptor = new BasicTextEncryptor();
+        textEncryptor.setPassword(password);
+        return textEncryptor.decrypt(encryptedNote.getEncryptedContent());
     }
 }

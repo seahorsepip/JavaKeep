@@ -87,12 +87,17 @@ public class NoteJPAContext extends JPAContext implements NoteContext {
 
     @Override
     public void update(Noteable noteable, Long accountId) {
-        Note note = getById(noteable.getId(), accountId);
         EntityManager entityManager = getEntityManager();
-        note.setTitle(noteable.getTitle());
-        note.setContent(noteable.getContent());
-        note.setDate(new Date());
         entityManager.getTransaction().begin();
+        Note note = getById(noteable.getId(), accountId);
+        note.setTitle(noteable.getTitle());
+        if(noteable.getType() == com.seapip.teunthomas.javakeep.dto.Note.Type.ENCRYPTED) {
+            ((EncryptedNote)note).setEncryptedContent(((EncryptedNote) note).getEncryptedContent());
+            System.out.println(((EncryptedNote) note).getEncryptedContent());
+        } else {
+            note.setContent(noteable.getContent());
+        }
+        note.setDate(new Date());
         entityManager.merge(note);
         entityManager.getTransaction().commit();
         entityManager.close();

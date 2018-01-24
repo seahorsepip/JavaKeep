@@ -27,7 +27,6 @@ public class Note implements com.seapip.teunthomas.javakeep.entities.Noteable {
     @JoinColumn(name = "folderId")
     private Folder folder;
 
-
     public Note() {
     }
 
@@ -78,7 +77,7 @@ public class Note implements com.seapip.teunthomas.javakeep.entities.Noteable {
 
     @Override
     public com.seapip.teunthomas.javakeep.dto.Note.Type getType() {
-        return null;
+        return com.seapip.teunthomas.javakeep.dto.Note.Type.PLAINTEXT;
     }
 
     public void setAccount(Account account) {

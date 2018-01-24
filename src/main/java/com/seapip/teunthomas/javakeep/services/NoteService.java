@@ -3,6 +3,7 @@ package com.seapip.teunthomas.javakeep.services;
 import com.seapip.teunthomas.javakeep.dto.Note;
 import com.seapip.teunthomas.javakeep.filters.Authorization;
 import com.seapip.teunthomas.javakeep.repositories.NoteRepository;
+import org.jasypt.exceptions.EncryptionOperationNotPossibleException;
 
 import javax.inject.Inject;
 import javax.ws.rs.*;
@@ -29,9 +30,13 @@ public class NoteService {
     @GET
     @Path("{id}")
     @Authorization
-    public Response getById(@Context ContainerRequestContext requestContext, @PathParam("id") long id) {
-        Note note = repository.getById(id, (Long) requestContext.getProperty("id"));
-        return Response.status(note == null ? 404 : 200).entity(note).build();
+    public Response getById(@Context ContainerRequestContext requestContext, @PathParam("id") long id, @QueryParam("password") String password) {
+        try {
+            Note note = repository.getById(id, (Long) requestContext.getProperty("id"), password);
+            return Response.status(note == null ? 404 : 200).entity(note).build();
+        } catch (EncryptionOperationNotPossibleException e) {
+            return Response.status(401).build();
+        }
     }
 
     @GET
