@@ -1,16 +1,112 @@
 <html>
 <head>
+    <title>JavaKeep</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css?family=Roboto');
+        @import url('https://fonts.googleapis.com/icon?family=Material+Icons');
 
+        html,
+        body {
+            font-family: 'Roboto', sans-serif;
+            padding: 0;
+            margin: 0;
+        }
+
+        button {
+            background-color: black;
+            color: white;
+            font-size: 14px;
+            font-weight: bold;
+            border: 0;
+            height: 48px;
+            padding: 0 16px;
+            cursor: pointer;
+            text-transform: uppercase;
+            font-family: 'Roboto', sans-serif;
+        }
+
+        form.note-editor {
+            min-height: 100%;
+            float: left;
+        }
+
+        form.note-editor input,
+        form.note-editor textarea {
+            width: 320px;
+            display: block;
+            margin: 20px 0;
+            background: none;
+            padding: 0;
+            font-family: 'Roboto', sans-serif;
+            border: 0;
+            border-bottom: 2px solid black;
+            outline: 0;
+        }
+
+        form.note-editor input {
+            height: 48px;
+        }
+
+        form.note-editor textarea {
+            line-height: 32px;
+            padding: 8px 0;
+        }
+
+        ul.data {
+            float: left;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            width: 340px;
+            border-right: 2px solid #eee;
+        }
+
+        ul.data li {
+            list-style: none;
+            line-height: 52px;
+            padding: 0 20px;
+            width: 300px;
+            cursor: pointer;
+        }
+
+        ul.data li i {
+            float: left;
+            margin: 12px 8px 0 0;
+        }
+
+        ul.data li:first-child {
+            margin-top: 92px;
+        }
+
+        ul.data li .delete-note {
+            float: right;
+            height: 36px;
+            padding: 0 10px;
+            margin-top: 8px;
+            font-size: 12px;
+        }
+
+        .create-note {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+        }
+    </style>
 </head>
 <body>
 <button class="create-note">Create note</button>
 <ul class="data"></ul>
-<form class="note-editor" style="display: none;">
-    <input type="text" placeholder="Title">
-    <textarea placeholder="Content"></textarea>
-    <input type="text" placeholder="Password">
-    <button>Save</button>
-</form>
+<dialog>
+    <form class="note-editor" method="dialog">
+        <h3>Title</h3>
+        <input type="text" placeholder="Title">
+        <h3>Content</h3>
+        <textarea placeholder="Content"></textarea>
+        <h3>Password (optional)</h3>
+        <input type="text" placeholder="Password">
+        <button>Save</button>
+    </form>
+</dialog>
 <script>
     const data = document.querySelector('.data');
     const createNote = document.querySelector('.create-note');
@@ -22,7 +118,7 @@
         if (e.target) {
             if (e.target.matches('.note')) {
                 let password = '';
-                if(e.target.dataset.type == "ENCRYPTED") {
+                if (e.target.dataset.type == "ENCRYPTED") {
                     password = prompt('Enter password')
                 }
                 fetch(`api/notes/${e.target.dataset.id}?password=${password}`, {
@@ -32,7 +128,7 @@
                 })
                     .then(response => response.json())
                     .then(note => {
-                        noteEditor.style.display = 'block';
+                        noteEditor.parentNode.showModal();
                         noteEditor.dataset.id = note.id;
                         noteEditor.querySelector('input:first-of-type').value = note.title;
                         noteEditor.querySelector('textarea').value = note.content;
@@ -51,10 +147,9 @@
         }
     });
 
-    createNote.addEventListener('click', e => noteEditor.style.display = 'block');
+    createNote.addEventListener('click', e => noteEditor.parentNode.showModal());
 
     noteEditor.addEventListener('submit', e => {
-        e.preventDefault();
         let pw = noteEditor.querySelector('input:last-of-type').value;
 
         fetch(`api/notes/${noteEditor.dataset.id ? noteEditor.dataset.id : ''}?password=${pw ? pw : ''}`, {
@@ -70,7 +165,6 @@
         });
         delete noteEditor.dataset.id;
         noteEditor.reset();
-        noteEditor.style.display = 'none';
         fetchData();
     });
 
@@ -100,7 +194,7 @@
             .then(notes => {
                 let html = '';
                 notes.forEach(note => {
-                    html += `<li data-id="${note.id}" data-type="${note.type}" class="note">Note: ${note.title} <button class="delete-note">Delete</button></li>`;
+                    html += `<li data-id="${note.id}" data-type="${note.type}" class="note"><i class="material-icons">insert_drive_file</i> ${note.title} <button class="delete-note">Delete</button></li>`;
                 });
                 data.innerHTML += html;
             });
