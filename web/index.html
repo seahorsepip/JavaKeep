@@ -19,20 +19,21 @@
             font-weight: bold;
             border: 0;
             height: 48px;
+            line-height: 48px;
             padding: 0 16px;
             cursor: pointer;
             text-transform: uppercase;
             font-family: 'Roboto', sans-serif;
         }
 
-        form.note-editor {
-            min-height: 100%;
+        button i {
             float: left;
+            margin: 12px 8px 0 0;
         }
 
-        form.note-editor input,
-        form.note-editor textarea {
-            width: 320px;
+        form input,
+        form textarea {
+            width: 420px;
             display: block;
             margin: 20px 0;
             background: none;
@@ -43,30 +44,32 @@
             outline: 0;
         }
 
-        form.note-editor input {
+        form input {
             height: 48px;
         }
 
-        form.note-editor textarea {
+        form textarea {
             line-height: 32px;
             padding: 8px 0;
         }
 
         ul.data {
-            float: left;
             height: 100%;
-            margin: 0;
+            margin: 0 auto;
             padding: 0;
-            width: 340px;
-            border-right: 2px solid #eee;
+            width: 540px;
         }
 
         ul.data li {
             list-style: none;
             line-height: 52px;
-            padding: 0 20px;
-            width: 300px;
+            padding: 8px 16px;
+            width: 500px;
             cursor: pointer;
+        }
+
+        ul.data li:hover {
+            background: #eeeeee;
         }
 
         ul.data li i {
@@ -74,28 +77,70 @@
             margin: 12px 8px 0 0;
         }
 
-        ul.data li:first-child {
-            margin-top: 92px;
-        }
-
         ul.data li .delete-note {
             float: right;
             height: 36px;
+            line-height: 36px;
             padding: 0 10px;
             margin-top: 8px;
             font-size: 12px;
         }
 
-        .create-note {
+        nav {
+            overflow: hidden;
+            background: #f6f6f6;
+            margin-bottom: 20px;
+            height: 88px;
+        }
+
+        nav button {
+            margin: 20px 0;
+            margin-right: 20px;
+            float: right;
+        }
+
+        .actions {
+            width: 540px;
+            margin: 0 auto;
+            overflow: hidden;
             position: absolute;
-            top: 20px;
-            left: 20px;
+            left: 50%;
+            top: 0;
+            margin-left: -270px;
+        }
+
+        .actions button {
+            float: left;
+        }
+
+        .user {
+            line-height: 48px;
+            float: right;
+            margin-right: 20px;
         }
     </style>
 </head>
 <body>
-<button class="create-note">Create note</button>
+<nav>
+    <div class="actions" style="display: none;">
+        <button class="create-note"><i class="material-icons">note_add</i>Create note</button>
+        <button class="create-folder"><i class="material-icons">create_new_folder</i>Create folder</button>
+    </div>
+    <button class="login">Login</button>
+    <button class="register">Register</button>
+    <button class="logout" style="display: none;">Logout</button>
+    <p class="user"></p>
+</nav>
 <ul class="data"></ul>
+<dialog>
+    <form class="register-and-login" method="dialog">
+        <h3>Email</h3>
+        <input type="email" placeholder="Email">
+        <h3>Password</h3>
+        <input type="password" placeholder="Password">
+        <button>Login</button>
+    </form>
+</dialog>
 <dialog>
     <form class="note-editor" method="dialog">
         <h3>Title</h3>
@@ -103,16 +148,103 @@
         <h3>Content</h3>
         <textarea placeholder="Content"></textarea>
         <h3>Password (optional)</h3>
-        <input type="text" placeholder="Password">
+        <input type="password" placeholder="Password">
+        <button>Save</button>
+    </form>
+</dialog>
+<dialog>
+    <form class="folder-editor" method="dialog">
+        <h3>Name</h3>
+        <input type="text" placeholder="Name">
         <button>Save</button>
     </form>
 </dialog>
 <script>
+    const loginButton = document.querySelector('.login');
+    const registerbutton = document.querySelector('.register');
+    const logoutButton = document.querySelector('.logout');
+    const user = document.querySelector('.user');
+    const registerAndLogin = document.querySelector('.register-and-login');
     const data = document.querySelector('.data');
+    const actions = document.querySelector('.actions');
     const createNote = document.querySelector('.create-note');
     const noteEditor = document.querySelector('.note-editor');
+    const createFolder = document.querySelector('.create-folder');
+    const folderEditor = document.querySelector('.folder-editor');
 
-    fetchData();
+    loginButton.addEventListener('click', e => {
+        registerAndLogin.querySelector('button').innerHTML = 'Login';
+        registerAndLogin.addEventListener('submit', function () {
+            registerAndLogin.removeEventListener('submit', this);
+            login(registerAndLogin.querySelector('input:first-of-type').value,
+                registerAndLogin.querySelector('input:last-of-type').value);
+        });
+        registerAndLogin.parentNode.showModal();
+    });
+
+    registerbutton.addEventListener('click', e => {
+        registerAndLogin.querySelector('button').innerHTML = 'Register';
+        registerAndLogin.addEventListener('submit', function () {
+            registerAndLogin.removeEventListener('submit', this);
+            register(registerAndLogin.querySelector('input:first-of-type').value,
+                registerAndLogin.querySelector('input:last-of-type').value);
+        });
+        registerAndLogin.parentNode.showModal();
+    });
+
+    logoutButton.addEventListener('click', e => logout());
+
+    function login(email, password) {
+        const token = `Basic ${btoa(email + ':' + password)}`;
+        fetch(`api/notes/`, {
+            headers: {
+                Authorization: token
+            }
+        })
+            .then(response => {
+                if (response.status != 401) {
+                    localStorage.setItem('token', token)
+                    afterLogin()
+                } else {
+                    alert('Invalid email and/or password')
+                }
+            });
+    }
+
+    function register(email, password) {
+        fetch(`api/accounts/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                email: email,
+                password: password
+            })
+        })
+            .then(() => login(email, password));
+    }
+
+    function logout() {
+        localStorage.removeItem('token');
+        data.innerHTML = '';
+        loginButton.style.display = "block";
+        registerbutton.style.display = "block";
+        actions.style.display = "none";
+        logoutButton.style.display = "none";
+        user.innerHTML = ""
+    }
+
+    function afterLogin() {
+        loginButton.style.display = "none";
+        registerbutton.style.display = "none";
+        actions.style.display = "block";
+        logoutButton.style.display = "block";
+        user.innerHTML = atob(localStorage.getItem('token').split(' ')[1]).split(':')[0];
+        fetchData()
+    }
+
+    if (localStorage.getItem('token')) afterLogin(); else logout();
 
     data.addEventListener('click', e => {
         if (e.target) {
@@ -123,7 +255,7 @@
                 }
                 fetch(`api/notes/${e.target.dataset.id}?password=${password}`, {
                     headers: {
-                        Authorization: `Basic ${btoa('thomas@email.com:secret')}`
+                        Authorization: localStorage.getItem('token')
                     }
                 })
                     .then(response => response.json())
@@ -139,7 +271,7 @@
                 fetch(`api/notes/${e.target.parentNode.dataset.id}`, {
                     method: "DELETE",
                     headers: {
-                        Authorization: `Basic ${btoa('thomas@email.com:secret')}`
+                        Authorization: localStorage.getItem('token')
                     }
                 })
                     .then(() => fetchData())
@@ -148,6 +280,7 @@
     });
 
     createNote.addEventListener('click', e => noteEditor.parentNode.showModal());
+    createFolder.addEventListener('click', e => folderEditor.parentNode.showModal());
 
     noteEditor.addEventListener('submit', e => {
         let pw = noteEditor.querySelector('input:last-of-type').value;
@@ -155,7 +288,7 @@
         fetch(`api/notes/${noteEditor.dataset.id ? noteEditor.dataset.id : ''}?password=${pw ? pw : ''}`, {
             method: 'POST',
             headers: {
-                Authorization: `Basic ${btoa('thomas@email.com:secret')}`,
+                Authorization: localStorage.getItem('token'),
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
@@ -173,7 +306,7 @@
         //Get folders
             .then(() => fetch('api/folders', {
                 headers: {
-                    Authorization: `Basic ${btoa('thomas@email.com:secret')}`
+                    Authorization: localStorage.getItem('token')
                 }
             }))
             .then(response => response.json())
@@ -187,17 +320,18 @@
             //Get notes
             .then(() => fetch('api/notes', {
                 headers: {
-                    Authorization: `Basic ${btoa('thomas@email.com:secret')}`
+                    Authorization: localStorage.getItem('token')
                 }
             }))
             .then(response => response.json())
             .then(notes => {
                 let html = '';
-                notes.forEach(note => {
+                notes.reverse().forEach(note => {
                     html += `<li data-id="${note.id}" data-type="${note.type}" class="note"><i class="material-icons">insert_drive_file</i> ${note.title} <button class="delete-note">Delete</button></li>`;
                 });
                 data.innerHTML += html;
-            });
+            })
+            .catch(e => logout());
     }
 </script>
 </body>
